@@ -136,121 +136,7 @@
   }
 
   /* -------------------------------------------------------
-     3. Contact form validation
-     ------------------------------------------------------- */
-  var form = document.getElementById("contact-form");
-  var formStatus = document.getElementById("form-status");
-
-  var validators = {
-    name: function (value) {
-      if (value.trim() === "") {
-        return "Please enter your name.";
-      }
-      if (value.trim().length < 2) {
-        return "Please enter your full name (at least 2 characters).";
-      }
-      return "";
-    },
-    email: function (value) {
-      if (value.trim() === "") {
-        return "Please enter your email address.";
-      }
-      // Simple, permissive pattern: local@domain.tld
-      var pattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-      if (!pattern.test(value.trim())) {
-        return "Please enter a valid email address, for example name@example.com.";
-      }
-      return "";
-    },
-    message: function (value) {
-      if (value.trim() === "") {
-        return "Please enter a message.";
-      }
-      if (value.trim().length < 10) {
-        return "Please enter a message of at least 10 characters.";
-      }
-      return "";
-    }
-  };
-
-  function showFieldError(field, message) {
-    var errorEl = document.getElementById(field.id + "-error");
-    if (message) {
-      field.setAttribute("aria-invalid", "true");
-      // Real DOM text (not CSS content) so screen readers always announce it.
-      if (errorEl) errorEl.textContent = "Error: " + message;
-    } else {
-      field.removeAttribute("aria-invalid");
-      if (errorEl) errorEl.textContent = "";
-    }
-  }
-
-  function validateField(field) {
-    var validator = validators[field.id];
-    if (!validator) return true;
-    var message = validator(field.value);
-    showFieldError(field, message);
-    return message === "";
-  }
-
-  if (form) {
-    form.classList.add("was-validated");
-
-    var fields = Array.prototype.slice.call(
-      form.querySelectorAll("#name, #email, #message")
-    );
-
-    // Re-validate a field once it has an error, so users get live feedback.
-    fields.forEach(function (field) {
-      field.addEventListener("input", function () {
-        if (field.getAttribute("aria-invalid") === "true") {
-          validateField(field);
-        }
-      });
-      field.addEventListener("blur", function () {
-        if (field.value.trim() !== "") {
-          validateField(field);
-        }
-      });
-    });
-
-    form.addEventListener("submit", function (event) {
-      event.preventDefault();
-
-      var firstInvalid = null;
-      fields.forEach(function (field) {
-        var valid = validateField(field);
-        if (!valid && !firstInvalid) {
-          firstInvalid = field;
-        }
-      });
-
-      if (firstInvalid) {
-        if (formStatus) {
-          formStatus.textContent =
-            "Your message was not sent. Please fix the errors marked above and try again.";
-          formStatus.classList.remove("is-success");
-          formStatus.classList.add("is-error");
-        }
-        firstInvalid.focus();
-        return;
-      }
-
-      if (formStatus) {
-        formStatus.textContent =
-          "Thank you! Your message has been sent. I will reply as soon as I can.";
-        formStatus.classList.remove("is-error");
-        formStatus.classList.add("is-success");
-      }
-      form.reset();
-      fields.forEach(function (field) {
-        showFieldError(field, "");
-      });
-    });
-  }
-
-  /* -------------------------------------------------------
-     4. Light / dark theme switcher
+     3. Light / dark theme switcher
      ------------------------------------------------------- */
   var themeToggle = document.getElementById("theme-toggle");
   var themeToggleText = document.getElementById("theme-toggle-text");
@@ -281,11 +167,10 @@
     return systemDarkQuery.matches;
   }
 
-  // Effective theme: explicit choice wins, otherwise follow the OS.
+  // Effective theme: explicit choice wins, otherwise default to dark.
   function getEffectiveTheme() {
     var stored = getStoredTheme();
-    if (stored === "light" || stored === "dark") return stored;
-    return systemPrefersDark() ? "dark" : "light";
+    return stored === "light" ? "light" : "dark";
   }
 
   function renderThemeToggle(effective) {
@@ -339,7 +224,7 @@
   }
 
   /* -------------------------------------------------------
-     5. Footer year
+     4. Footer year
      ------------------------------------------------------- */
   var yearEl = document.getElementById("current-year");
   if (yearEl) {
@@ -347,7 +232,7 @@
   }
 
   /* -------------------------------------------------------
-     6. Anchor scrolling respects reduced motion
+     5. Anchor scrolling respects reduced motion
      ------------------------------------------------------- */
   if (prefersReducedMotion.matches) {
     document.documentElement.style.scrollBehavior = "auto";
